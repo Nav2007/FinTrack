@@ -5,6 +5,7 @@ import Name from "../inputs/NameInput";
 import Password from "../inputs/PasswordInput";
 import Email from "../inputs/EmailInput"
 import Currency from "../inputs/CurrencyInput";
+import { registerUser } from "../api/authApi";
 
 const registerSchema=z.
 object({
@@ -38,8 +39,17 @@ const{register,handleSubmit,formState:{errors}}=useForm({
   resolver: zodResolver(registerSchema),
 });
 
-function onSubmit(data) {
-  console.log(data);
+async function onSubmit(data) {
+  try {
+    const { confirmPassword, ...userData } = data;
+
+    const response = await registerUser(userData);
+
+    console.log(response.data);
+
+  } catch (error) {
+    console.log(error.response?.data);
+  }
 }
 return(
 <form onSubmit={handleSubmit(onSubmit)}>
