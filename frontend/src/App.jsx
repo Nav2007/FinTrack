@@ -1,10 +1,8 @@
-import Transactionform from './pages/protected_pages/TransactionForm.jsx'
-import Dashboard from './pages/protected_pages/Dashboard.jsx'
+import Register from './pages/RegistrationForm.jsx'
 function App() {
   return (
     <>
-    <Transactionform/>
-    <Dashboard/>
+    <Register/>
     </>
 
   )
