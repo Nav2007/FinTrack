@@ -1,8 +1,8 @@
-import Register from './pages/RegistrationForm.jsx'
+import Account from './pages/protected_pages/Accounts'
 function App() {
   return (
     <>
-    <Register/>
+    <Account/>
     </>
 
   )

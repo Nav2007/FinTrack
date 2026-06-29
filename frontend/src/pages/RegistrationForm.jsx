@@ -35,21 +35,36 @@ object({
 })
 
 export default function Register() {
-const{register,handleSubmit,formState:{errors}}=useForm({
+const{register,handleSubmit,setError,formState:{errors}}=useForm({
   resolver: zodResolver(registerSchema),
 });
 
 async function onSubmit(data) {
-  try {
-    const { confirmPassword, ...userData } = data;
 
-    const response = await registerUser(userData);
+    try {
 
-    console.log(response.data);
+        const { confirmPassword, ...userData } = data;
 
-  } catch (error) {
-    console.log(error.response?.data);
-  }
+        const response = await registerUser(userData);
+
+        console.log(response.data);
+
+    }
+    catch (error) {
+
+        const response = error.response?.data;
+
+        if (!response) {
+            console.error(error);
+            return;
+        }
+
+        setError(response.field, {
+            type: "server",
+            message: response.message
+        });
+
+    }
 }
 return(
 <form onSubmit={handleSubmit(onSubmit)}>
