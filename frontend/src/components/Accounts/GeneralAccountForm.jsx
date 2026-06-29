@@ -11,6 +11,7 @@ import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 
 import CircleIcon from "@mui/icons-material/Circle";
+import {createGeneralAccount} from "../../api/accountApi";
 
 const accountColors = [
     "#3B82F6",
@@ -29,7 +30,7 @@ const generalAccountSchema = z.object({
         .string()
         .trim()
         .min(1, "Enter account name")
-        .max(100, "Maximum 100 characters"),
+        .max(50, "Maximum 50 characters"),
 
     openingBalance: z
         .coerce
@@ -62,6 +63,8 @@ export default function GeneralAccountForm({
 
         reset,
 
+        setError,
+
         formState: {
 
             errors
@@ -86,15 +89,41 @@ export default function GeneralAccountForm({
 
     const selectedColor = watch("color");
 
-    function onSubmit(data) {
+    async function onSubmit(data) {
 
-        console.log(data);
+    try {
+
+        const response =
+            await createGeneralAccount(data);
+
+        console.log(response.data);
 
         reset();
 
         onClose();
 
     }
+
+    catch (error) {
+
+        if (error.response?.data?.field) {
+
+            setError(
+                error.response.data.field,
+                {
+                    type: "server",
+                    message: error.response.data.message
+                }
+            );
+
+            return;
+        }
+
+        console.error(error);
+
+    }
+
+}
 
     return (
 

@@ -1,5 +1,5 @@
-const pool = require('../config/db');
-const bcrypt = require('bcryptjs');
+const pool = require("../config/db");
+const bcrypt = require("bcryptjs");
 
 const register = async (req, res) => {
     try {
@@ -13,20 +13,15 @@ const register = async (req, res) => {
             currency
         } = req.body;
 
-        // Clean incoming data
-        const firstNameTrimmed = firstName.trim();
-        const lastNameTrimmed = lastName?.trim() || null;
-        const usernameTrimmed = username.trim();
-        const emailTrimmed = email.trim().toLowerCase();
-
         // Check email
         const [emailUser] = await pool.query(
             "SELECT id FROM users WHERE email = ?",
-            [emailTrimmed]
+            [email]
         );
 
-        if (emailUser.length) {
+        if (emailUser.length > 0) {
             return res.status(400).json({
+                field: "email",
                 message: "Email already registered"
             });
         }
@@ -34,17 +29,20 @@ const register = async (req, res) => {
         // Check username
         const [usernameUser] = await pool.query(
             "SELECT id FROM users WHERE username = ?",
-            [usernameTrimmed]
+            [username]
         );
 
-        if (usernameUser.length) {
+        if (usernameUser.length > 0) {
             return res.status(400).json({
+                field: "username",
                 message: "Username already taken"
             });
         }
 
+        // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
 
+        // Insert user
         await pool.query(
             `
             INSERT INTO users
@@ -59,26 +57,27 @@ const register = async (req, res) => {
             VALUES (?, ?, ?, ?, ?, ?)
             `,
             [
-                firstNameTrimmed,
-                lastNameTrimmed,
-                usernameTrimmed,
-                emailTrimmed,
+                firstName,
+                lastName,
+                username,
+                email,
                 hashedPassword,
                 currency
             ]
         );
 
-        res.status(201).json({
+        return res.status(201).json({
             message: "Registration successful"
         });
 
     } catch (error) {
 
-        console.log(error);
+        console.error(error);
 
-        res.status(500).json({
+        return res.status(500).json({
             message: "Server Error"
         });
+
     }
 };
 

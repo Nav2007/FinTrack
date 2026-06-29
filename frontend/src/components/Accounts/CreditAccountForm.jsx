@@ -9,6 +9,7 @@ import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 
 import CircleIcon from "@mui/icons-material/Circle";
+import {createCreditAccount} from "../../api/accountApi";
 
 const accountColors = [
     "#3B82F6",
@@ -27,7 +28,7 @@ const creditAccountSchema = z.object({
         .string()
         .trim()
         .min(1, "Enter account name")
-        .max(100, "Maximum 100 characters"),
+        .max(50, "Maximum 50 characters"),
 
     creditLimit: z
         .coerce
@@ -70,6 +71,7 @@ export default function CreditAccountForm({
         setValue,
 
         reset,
+        setError,
 
         formState: {
 
@@ -99,15 +101,41 @@ export default function CreditAccountForm({
 
     const selectedColor = watch("color");
 
-    const onSubmit = (data) => {
+   async function onSubmit(data) {
 
-        console.log(data);
+    try {
+
+        const response =
+            await createCreditAccount(data);
+
+        console.log(response.data);
 
         reset();
 
         onClose();
 
-    };
+    }
+
+    catch (error) {
+
+        if (error.response?.data?.field) {
+
+            setError(
+                error.response.data.field,
+                {
+                    type: "server",
+                    message: error.response.data.message
+                }
+            );
+
+            return;
+        }
+
+        console.error(error);
+
+    }
+
+}
 
     return (
 
